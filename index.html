@@ -66,8 +66,16 @@
           <input id="dueDateInput" type="date" class="form-control" placeholder="Select due date">
           <button id="addTodoBtn" class="btn btn-primary">Add Task</button>
         </div>
+        <div class="d-flex justify-content-between mb-3">
+          <select id="filterStatus" class="form-select w-50">
+            <option value="All">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Working">Working</option>
+            <option value="Complete">Complete</option>
+          </select>
+          <button id="deleteAllBtn" class="btn btn-danger">Delete All Tasks</button>
+        </div>
         <ul id="todoList" class="list-group"></ul>
-        <button id="deleteAllBtn" class="btn btn-danger w-100 mt-3">Delete All Tasks</button>
       </div>
     </div>
   </div>
@@ -81,6 +89,7 @@
     const addTodoBtn = document.getElementById("addTodoBtn");
     const todoList = document.getElementById("todoList");
     const deleteAllBtn = document.getElementById("deleteAllBtn");
+    const filterStatus = document.getElementById("filterStatus");
 
     // Initialize tasks from local storage
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
@@ -90,13 +99,16 @@
       localStorage.setItem("tasks", JSON.stringify(tasks));
     }
 
-    // Render tasks
+    // Render tasks based on the selected filter
     function renderTasks() {
+      const filter = filterStatus.value; // Get selected filter value
       todoList.innerHTML = ""; // Clear the list
-      tasks.forEach((task, index) => {
-        const listItem = createTodoItem(task, index);
-        todoList.appendChild(listItem);
-      });
+      tasks
+        .filter(task => filter === "All" || task.status === filter) // Filter tasks by status
+        .forEach((task, index) => {
+          const listItem = createTodoItem(task, index);
+          todoList.appendChild(listItem);
+        });
     }
 
     // Create a task item
@@ -198,6 +210,9 @@
         renderTasks();
       }
     });
+
+    // Filter tasks based on status
+    filterStatus.addEventListener("change", renderTasks);
 
     // Initial render
     renderTasks();
